@@ -10,6 +10,7 @@ options(echo=TRUE) # if you want see commands in output file
 args <- commandArgs(trailingOnly = TRUE)
 print(args)
 
+
 #Call libraries
 library(affy);
 
@@ -17,10 +18,24 @@ curDir <- getwd();
 celDir = args[1];
 setwd(celDir);
 
+#Get annotation file
+annot <- read.delim(args[2]);
+rownames(annot) <- annot[,1];
+
 #Process
 tmpData <- ReadAffy();
 tmpData <- mas5(tmpData, sc=150);
-dataExp <- exprs(tmpData);
+dataExp <- data.frame(exprs(tmpData));
+
+#Update with gene names instead of probes 
+dataExp[,"MAX"] <- apply(dataExp, FUN=max, MARGIN=1);
+dataExp <- dataExp[order(-dataExp[,"MAX"]),]
+annot <- annot[rownames(dataExp),];
+dataExp[,"Gene"] <- as.character(annot[,"Gene.Symbol"]);
+dataExp <- dataExp[!duplicated(dataExp[,"Gene"]),]
+dataExp <- dataExp[!grepl("\\//", dataExp[,"Gene"]),];
+rownames(dataExp) <- dataExp[,"Gene"];
+
 
 zLog <- function(data)
 {
@@ -30,8 +45,8 @@ tmp <- (tmp-mean(tmp))/sd(tmp);
 
 zDataExp <- zLog(data);
 setwd(curDir);
-expFileName <- paste(args[1], "_Exprs.txt", sep="");
-zExpFileName <- paste(args[1], "_Z_Scores.txt", sep="");
+expFileName <- paste(args[3], "_Exprs.txt", sep="");
+zExpFileName <- paste(args[3], "_Z_Scores.txt", sep="");
 
 write.table(dataExp, expFileName, sep="\t", row.names=T);
 write.table(dataExp, zExpFileName, sep="\t", row.names=T);
