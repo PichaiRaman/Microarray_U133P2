@@ -31,6 +31,7 @@ rownames(annot) <- annot[,1];
 tmpData <- ReadAffy();
 tmpData <- mas5(tmpData, sc=150);
 dataExp <- data.frame(exprs(tmpData));
+numCol <- ncol(dataExp);
 
 #Update with gene names instead of probes 
 dataExp[,"MAX"] <- apply(dataExp, FUN=max, MARGIN=1);
@@ -40,15 +41,16 @@ dataExp[,"Gene"] <- as.character(annot[,"Gene.Symbol"]);
 dataExp <- dataExp[!duplicated(dataExp[,"Gene"]),]
 dataExp <- dataExp[!grepl("\\//", dataExp[,"Gene"]),];
 rownames(dataExp) <- dataExp[,"Gene"];
+dataExp <- dataExp[,c(1:numCol)];
 
 
-zLog <- function(data)
+zLog <- function(x)
 {
-tmp <- log2(data);
+tmp <- log2(x);
 tmp <- (tmp-mean(tmp))/sd(tmp);
 }
 
-zDataExp <- zLog(data);
+zDataExp <- data.frame(t(apply(dataExp, FUN=zLog, MARGIN=1)));
 setwd(curDir);
 expFileName <- paste(args[3], "_Exprs.txt", sep="");
 zExpFileName <- paste(args[3], "_Z_Scores.txt", sep="");
