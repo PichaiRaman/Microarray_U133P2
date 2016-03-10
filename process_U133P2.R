@@ -3,6 +3,11 @@
 #Pichai Raman
 #March 7th 2016
 #Just call this function Rscript process_U133P2.R CEL FILE DIRECTORY
+#
+#First Argument - Cel File directory
+#Next Argument - Annotation File
+#Last Argumnet - prefix of name
+#
 ###########################################
 
 #This is to pass arguments to R
