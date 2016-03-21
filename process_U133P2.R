@@ -65,8 +65,8 @@ setwd(curDir);
 expFileName <- paste(args[3], "_Exprs.txt", sep="");
 zExpFileName <- paste(args[3], "_Z_Scores.txt", sep="");
 
-write.table(dataExp, expFileName, sep="\t", row.names=T);
-write.table(zDataExp, zExpFileName, sep="\t", row.names=T);
+write.table(dataExp, expFileName, sep="\t", row.names=F);
+write.table(zDataExp, zExpFileName, sep="\t", row.names=F);
 
 
 
