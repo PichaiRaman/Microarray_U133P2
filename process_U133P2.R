@@ -37,10 +37,13 @@ numCol <- ncol(dataExp);
 dataExp[,"MAX"] <- apply(dataExp, FUN=max, MARGIN=1);
 dataExp <- dataExp[order(-dataExp[,"MAX"]),]
 annot <- annot[rownames(dataExp),];
-dataExp[,"Gene"] <- as.character(annot[,"Gene.Symbol"]);
-dataExp <- dataExp[!duplicated(dataExp[,"Gene"]),]
-dataExp <- dataExp[!grepl("\\//", dataExp[,"Gene"]),];
-rownames(dataExp) <- dataExp[,"Gene"];
+dataExp[,"Hugo_Gene_Symbol"] <- as.character(annot[,"Gene.Symbol"]);
+dataExp[,"Entrez_Gene_Id"] <- as.character(annot[,"Entrez.Gene"]);
+
+dataExp <- dataExp[!duplicated(dataExp[,"Hugo_Gene_Symbol"]),]
+dataExp <- dataExp[!grepl("\\//", dataExp[,"Hugo_Gene_Symbol"]),];
+rownames(dataExp) <- dataExp[,"Hugo_Gene_Symbol"];
+dataAnnot <- dataExp[,c((numCol+2):ncol(dataExp))];
 dataExp <- dataExp[,c(1:numCol)];
 
 
@@ -51,12 +54,19 @@ tmp <- (tmp-mean(tmp))/sd(tmp);
 }
 
 zDataExp <- data.frame(t(apply(dataExp, FUN=zLog, MARGIN=1)));
+dataExp <- data.frame(dataAnnot, dataExp);
+zDataExp <- data.frame(dataAnnot, zDataExp);
+
+colnames(dataExp) <- gsub(".CEL", "", colnames(dataExp));
+colnames(zDataExp) <- gsub(".CEL", "", colnames(zDataExp));
+
+
 setwd(curDir);
 expFileName <- paste(args[3], "_Exprs.txt", sep="");
 zExpFileName <- paste(args[3], "_Z_Scores.txt", sep="");
 
 write.table(dataExp, expFileName, sep="\t", row.names=T);
-write.table(dataExp, zExpFileName, sep="\t", row.names=T);
+write.table(zDataExp, zExpFileName, sep="\t", row.names=T);
 
 
 
